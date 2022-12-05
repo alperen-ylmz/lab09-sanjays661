@@ -1,6 +1,5 @@
 #include "linkedListFuncs.h"
 #include <stddef.h>
-
 using namespace std;
 
 /*All functions MUST be implemented recursively
@@ -11,17 +10,46 @@ using namespace std;
 //head: ptr to a Node * which is the head of a linked list
 //return sum of all values in linked list using a recursive approach
 //if head is null return 0
-int recursiveSum(Node* head) {
-  return -42;
+int recursiveSum(Node* head) 
+{
+    if (head == nullptr) // base case: head is null
+    {
+        return 0;
+    }
+    else if (head->next == nullptr) // base case: linked list has one element
+    {
+        return head->data;
+    }
+    else
+    {
+        return head->data + recursiveSum(head->next);
+    }
 }
 
 
 //head: ptr to a Node* which is the head of a linked list
 //return the largest value in the linked list using a recursive approach
 //you may assume the list has at least one element
-int recursiveLargestValue(Node* head) {
-
-  return -42;
+int recursiveLargestValue(Node* head) 
+{
+    if (head->next == nullptr) 
+    // base case: linked list has one element
+    {
+        return head->data;
+    }
+    else
+    {
+        if (head->data > recursiveLargestValue(head->next))
+        // if head is the largest value in the linked list, greater than all values following it
+        {
+            return head->data;
+        }
+        else
+        // if head is not the largest value in the linked list
+        {
+            return recursiveLargestValue(head->next);
+        }
+    }
 }
 
 
@@ -32,9 +60,20 @@ int recursiveLargestValue(Node* head) {
  * Example: n1 -> n2 -> n3 -> n4 -> n5, k = 3
  * Return &n3
  */
-Node* recursiveFindKthNode(Node *head, int k){
-    return NULL;
-    //STUB: edit with the correct output, according to the lab instructions, using recursion
+Node* recursiveFindKthNode(Node *head, int k)
+{
+    if (head == nullptr || k < 1) // base case: head is null or k is less than 1
+    {
+        return nullptr;
+    }
+    else if (k == 1) // base case: k = 1
+    {
+        return head;
+    }
+    else // recursive case
+    {
+        return recursiveFindKthNode(head->next, k-1);
+    }
 }
 
 
@@ -47,9 +86,27 @@ Node* recursiveFindKthNode(Node *head, int k){
 * Delete n2 and return &n1
 * New list should look like this: n1 -> n3 -> n4
 */
-Node* recursiveDeleteKthNode(Node *head, int k) {
-    return NULL;
-    //STUB: edit with the correct output, according to the lab instructions, using recursion
+Node* recursiveDeleteKthNode(Node *head, int k) 
+{
+    if (head == nullptr) // base case: head is null
+    {
+        return nullptr;
+    }
+    else if (k < 1) // base case: k < 1 - nothing is deleted
+    {
+        return head;
+    }
+    else if (k == 1) // base case: k = 1
+    {
+        Node* newHead = head->next;
+        delete head;
+        return newHead;
+    }
+    else // recursive case
+    {
+        head->next = recursiveDeleteKthNode(head->next, k-1);
+        return head;
+    }
 }
 
 
@@ -61,9 +118,29 @@ Node* recursiveDeleteKthNode(Node *head, int k) {
 * Example: n1 -> n2 -> n3 -> n4, k = 2
 * Delete n1, n2 and return &n3
 */
-Node* recursiveRemoveKFromFront(Node *head, int k) {
-    return NULL;
-    //STUB: edit with the correct output, according to the lab instructions, using recursion
+Node* recursiveRemoveKFromFront(Node *head, int k) 
+{
+    if (head == nullptr) // base case: head is null
+    {
+        return nullptr;
+    }
+    else if (k < 1) // base case: k < 1 - nothing is deleted
+    {
+        return head;
+    }
+    else
+    {
+        Node* newHead = head->next;
+        delete head;
+        if (k == 1) // base case: k = 1
+        {
+            return newHead;
+        }
+        else // recursive case
+        {
+            return recursiveRemoveKFromFront(newHead, k-1);
+        }
+    }
 }
 
 
@@ -74,8 +151,57 @@ Node* recursiveRemoveKFromFront(Node *head, int k) {
  * 	    List 2: 4 -> 5 -> 6
  * Return &head of the linked list 5 -> 7 -> 9 -> 12
  */
-Node* recursiveElementwiseSum(Node *head1, Node *head2) {
-    return NULL;
+Node* recursiveElementwiseSum(Node *head1, Node *head2) 
+{
+    if (head1 == nullptr && head2 == nullptr) // base case: head1 and head2 are null
+    {
+        return nullptr;
+    }
+    else if (head1 == nullptr) // recursive case: head1 is null but head2 is not
+    {
+        Node* cur = new Node{head2->data, nullptr};
+        // if there is a node following head2, apply its value to head2->next
+        if (head2->next != nullptr)
+        {
+            cur->next = recursiveElementwiseSum(nullptr, head2->next);
+        }
+        return cur;
+    }
+    else if (head2 == nullptr) // recursive case: head2 is null but head1 is not
+    {
+        Node* cur = new Node{head1->data, nullptr};
+        if (head1->next != nullptr)
+        // if there is a node following head1, apply its value to head1->next
+        {
+            cur->next = recursiveElementwiseSum(head1->next, nullptr);
+        }
+        return cur;
+    }
+    else // recursive case: neither head1 nor head2 are null
+    {
+        Node* cur = new Node{head1->data + head2->data, nullptr};
+        if (head1->next != nullptr && head2->next != nullptr) 
+        // if head1 and head2 are not at the end of either of their corresponding lists
+        {
+            cur->next = recursiveElementwiseSum(head1->next, head2->next);
+        }
+        else if (head1->next == nullptr)
+        // if head1 is final but head2 is not
+        {
+            cur->next = recursiveElementwiseSum(nullptr, head2->next);
+        }
+        else if (head2->next == nullptr)
+        // if head2 is final but head1 is not
+        {
+            cur->next = recursiveElementwiseSum(head1->next, nullptr);
+        }
+        else
+        // if both head1 and head2 are final nodes
+        {
+            cur->next = nullptr;
+        }
+        return cur;
+    }
     //STUB: edit with the correct output, according to the lab instructions, using recursion
 }
 
@@ -89,7 +215,21 @@ Node* recursiveElementwiseSum(Node *head1, Node *head2) {
  * Example: List 1: 1->2->3, List 2: 4 -> 5 -> 6
  * Return &head of 1 -> 4 -> 2 -> 5 -> 3 -> 6
  */
-Node* recursiveSplice(Node *head1, Node *head2) {
-    return NULL;
-    //STUB: edit with the correct output, according to the lab instructions, using recursion
+Node* recursiveSplice(Node *head1, Node *head2) 
+{
+    if (head1 == nullptr) // base case: head1 is null
+    {
+        return head2;
+    }
+    else if (head2 == nullptr) // base case: head2 is null but head1 is not
+    {
+        return head1;
+    }
+    else // recursive case: neither head1 nor head2 is null
+    {
+        Node *temp = head1->next; // stores head1->next as a temporary variable so it doesn't get orphaned
+        head1->next = head2;
+        head2->next = recursiveSplice(temp, head2->next);
+        return head1;
+    }
 }
