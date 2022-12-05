@@ -202,7 +202,6 @@ Node* recursiveElementwiseSum(Node *head1, Node *head2)
         }
         return cur;
     }
-    //STUB: edit with the correct output, according to the lab instructions, using recursion
 }
 
 
